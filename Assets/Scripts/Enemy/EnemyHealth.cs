@@ -1,20 +1,25 @@
 ﻿using UnityEngine;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
-public class EnemyHealth : MonoBehaviour
+public class EnemyHealth : PooledObject
 {
-    public int startingHealth = 100;
-    public int currentHealth;
+    public EnemyConfig config;
+
     public float sinkSpeed = 2.5f;
-    public int scoreValue = 10;
-    public AudioClip deathClip;
 
 
     Animator anim;
     AudioSource enemyAudio;
     ParticleSystem hitParticles;
     CapsuleCollider capsuleCollider;
-    bool isDead;
+    public bool isDead;
     bool isSinking;
+    int currentHealth;
+
+    private static readonly int hashDead = Animator.StringToHash("Dead");
+
+    ScoreManager scoreManager;
 
 
     void Awake ()
@@ -23,8 +28,8 @@ public class EnemyHealth : MonoBehaviour
         enemyAudio = GetComponent <AudioSource> ();
         hitParticles = GetComponentInChildren <ParticleSystem> ();
         capsuleCollider = GetComponent <CapsuleCollider> ();
-
-        currentHealth = startingHealth;
+        scoreManager = FindObjectOfType<ScoreManager>();
+        currentHealth = config.startingHealth;
     }
 
 
@@ -62,9 +67,9 @@ public class EnemyHealth : MonoBehaviour
 
         capsuleCollider.isTrigger = true;
 
-        anim.SetTrigger ("Dead");
+        anim.SetTrigger(hashDead);
 
-        enemyAudio.clip = deathClip;
+        enemyAudio.clip = config.deathClip;
         enemyAudio.Play ();
     }
 
@@ -74,7 +79,25 @@ public class EnemyHealth : MonoBehaviour
         GetComponent <UnityEngine.AI.NavMeshAgent> ().enabled = false;
         GetComponent <Rigidbody> ().isKinematic = true;
         isSinking = true;
-        ScoreManager.score += scoreValue;
-        Destroy (gameObject, 2f);
+        scoreManager?.AddScore(config.scoreValue);
+        StartCoroutine(SinkAndDespawn());
     }
+
+    private IEnumerator SinkAndDespawn()
+    {
+        yield return new WaitForSeconds(2f);
+        PoolManager.Instance.Despawn(gameObject);
+    }
+
+    public override void OnSpawned()
+    {
+        isDead = false;
+        isSinking = false;
+        currentHealth = config.startingHealth;
+        capsuleCollider.isTrigger = false;
+
+        anim.Rebind();
+        anim.Update(0f);
+    }
+
 }

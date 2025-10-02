@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.Events;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -9,15 +10,20 @@ public class ScoreManager : MonoBehaviour
 
     [SerializeField] Text text;
 
+    [System.Serializable]
+    public class ScoreChangedEvent : UnityEvent<int> { }
 
-    void Awake ()
+    public ScoreChangedEvent OnScoreChanged;
+
+    void Awake()
     {
         score = 0;
+        OnScoreChanged?.Invoke(score);
     }
 
-
-    void Update ()
+    public void AddScore(int amount)
     {
-        text.text = "Score: " + score;
+        score += amount;
+        OnScoreChanged?.Invoke(score);
     }
 }

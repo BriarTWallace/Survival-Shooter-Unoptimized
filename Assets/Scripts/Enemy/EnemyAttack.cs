@@ -3,8 +3,7 @@ using System.Collections;
 
 public class EnemyAttack : MonoBehaviour
 {
-    public float timeBetweenAttacks = 0.5f;
-    public int attackDamage = 10;
+    public EnemyConfig config;
 
 
     Animator anim;
@@ -13,6 +12,8 @@ public class EnemyAttack : MonoBehaviour
     EnemyHealth enemyHealth;
     bool playerInRange;
     float timer;
+
+    private static readonly int hashPlayerDead = Animator.StringToHash("PlayerDead");
 
 
     void Awake ()
@@ -46,14 +47,14 @@ public class EnemyAttack : MonoBehaviour
     {
         timer += Time.deltaTime;
 
-        if(timer >= timeBetweenAttacks && playerInRange && enemyHealth.currentHealth > 0)
+        if (timer >= config.attackInterval && playerInRange && enemyHealth != null)
         {
             Attack ();
         }
 
         if(playerHealth.currentHealth <= 0)
         {
-            anim.SetTrigger ("PlayerDead");
+            anim.SetTrigger(hashPlayerDead);
         }
     }
 
@@ -64,7 +65,7 @@ public class EnemyAttack : MonoBehaviour
 
         if(playerHealth.currentHealth > 0)
         {
-            playerHealth.TakeDamage (attackDamage);
+            playerHealth.TakeDamage (config.attackDamage);
         }
     }
 }

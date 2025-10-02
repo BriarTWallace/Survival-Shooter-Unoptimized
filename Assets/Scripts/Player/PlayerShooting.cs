@@ -17,6 +17,9 @@ public class PlayerShooting : MonoBehaviour
     Light gunLight;
     float effectsDisplayTime = 0.2f;
 
+    bool isFiring;
+    private PlayerControls controls;
+
 
     void Awake ()
     {
@@ -25,6 +28,20 @@ public class PlayerShooting : MonoBehaviour
         gunLine = GetComponent <LineRenderer> ();
         gunAudio = GetComponent<AudioSource> ();
         gunLight = GetComponent<Light> ();
+
+        controls = new PlayerControls();
+    }
+
+    private void OnEnable()
+    {
+        controls.Player.Fire.performed += ctx => isFiring = true;
+        controls.Player.Fire.canceled += ctx => isFiring = false;
+        controls.Enable();
+    }
+
+    void OnDisable()
+    {
+        controls.Disable();
     }
 
 
