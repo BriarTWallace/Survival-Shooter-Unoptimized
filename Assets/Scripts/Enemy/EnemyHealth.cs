@@ -94,10 +94,29 @@ public class EnemyHealth : PooledObject
         isDead = false;
         isSinking = false;
         currentHealth = config.startingHealth;
-        capsuleCollider.isTrigger = false;
+        if (capsuleCollider != null)
+            capsuleCollider.isTrigger = false;
 
-        anim.Rebind();
-        anim.Update(0f);
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+        var nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (nav != null)
+        {
+            nav.enabled = true;
+            nav.isStopped = false;
+            nav.ResetPath();
+        }
+
+        if (anim != null)
+        {
+            anim.Rebind();
+            anim.Update(0f);
+        }
     }
 
 }
