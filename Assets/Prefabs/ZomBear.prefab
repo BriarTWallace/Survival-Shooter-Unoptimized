@@ -200,6 +200,7 @@ MonoBehaviour:
   prefabReference: {fileID: 1161934229116340}
   config: {fileID: 11400000, guid: 4d80aa78d49707744859d6c9b23faa73, type: 2}
   sinkSpeed: 2.5
+  isDead: 0
 --- !u!82 &82684988033110934
 AudioSource:
   m_ObjectHideFlags: 0

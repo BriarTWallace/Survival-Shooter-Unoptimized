@@ -22,8 +22,8 @@ public class PoolManager : MonoBehaviour
         }
 
         Queue<GameObject> pool = pools[prefab];
-
         GameObject obj;
+
         if (pool.Count > 0)
         {
             obj = pool.Dequeue();
@@ -38,7 +38,11 @@ public class PoolManager : MonoBehaviour
         obj.transform.rotation = rotation;
 
         PooledObject pooledObj = obj.GetComponent<PooledObject>();
-        if (pooledObj != null) pooledObj.OnSpawned();
+        if (pooledObj != null)
+        {
+            pooledObj.prefabReference = prefab;
+            pooledObj.OnSpawned();
+        }
 
         return obj;
     }
@@ -58,9 +62,7 @@ public class PoolManager : MonoBehaviour
         pooledObj.OnDespawned();
 
         if (!pools.ContainsKey(key))
-        {
             pools[key] = new Queue<GameObject>();
-        }
 
         pools[key].Enqueue(obj);
     }
